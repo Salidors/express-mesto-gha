@@ -17,4 +17,12 @@ const server = http.createServer(() => {
   console.log("Пришёл запрос!");
 });
 
+app.use((req, res, next) => {
+  req.user = {
+    _id: "5d8b8592978f8bd833ca8133", // вставьте сюда _id созданного в предыдущем пункте пользователя
+  };
+
+  next();
+});
+
 server.listen(3000);

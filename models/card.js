@@ -10,23 +10,23 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    about: URL,
   },
   owner: {
     type: ObjectId,
     required: true,
-    enum: [],
+    array: [],
   },
   likes: {
     type: Array,
     required: true,
-    minlength: 2,
-    maxlength: 30,
+    array: [],
+    default: true,
   },
   createdAt: {
     type: Date,
     required: true,
-    minlength: 2,
-    maxlength: 30,
+    default: Date.now,
   },
 });
 
