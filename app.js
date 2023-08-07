@@ -1,43 +1,28 @@
-const http = require("http");
 const path = require("path");
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 const port = 3000;
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 
-const usersRouter = require('./routes/users');
+const usersRouter = require("./routes/users");
 
 app.use(bodyParser.json());
-app.use(express.static(root:"public"));
+app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/mynewdb");
+mongoose.connect("mongodb://127.0.0.1:27017/mestodb");
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
-});
-
-const { PORT = 3000, BASE_PATH } = process.env;
-
-
-app.use(express.static(path.join(__dirname, "public")));
-app.listen(PORT, () => {
-  console.log("Ссылка на сервер");
-  console.log(BASE_PATH);
-});
-
-const server = http.createServer(() => {
-  console.log("Пришёл запрос!");
 });
 
 app.use(usersRouter);
 
 app.use((req, res, next) => {
   req.user = {
-    _id: "5d8b8592978f8bd833ca8133", // вставьте сюда _id созданного в предыдущем пункте пользователя
+    _id: "64ca6b297252afdce090f6e0",
   };
-
   next();
 });
 
-server.listen(3000);
+module.exports = app;

@@ -5,15 +5,15 @@ const getUsers = (req, res) => {
     .then((user) => {
       return res.status(201).send(user);
     })
-    .catch((err) => res.status(500).sent("Server Error"));
+    .catch((err) => res.status(500).send("Server Error"));
 };
 
 const getUserById = (req, res) => {
-  return UserModel.findById(_Id)
+  return UserModel.findById(req.params.id)
     .then((user) => {
       return res.status(200).send(user);
     })
-    .catch((err) => res.status(500).sent("Server Error"));
+    .catch((err) => res.status(404).send("User not found"));
 };
 
 const createUser = (req, res) => {
@@ -26,10 +26,48 @@ const createUser = (req, res) => {
       if (err.name === "validationError") {
         return res.status(400).send("validationError");
       }
-      return res.status(201).send(req.body);
+      return res.status(422).send(req.body);
     });
 };
 
 const deleteUserById = (req, res) => {
-  res.send("удаление пользователя");
+  return UserModel.findByIdAndRemove(req.params.id)
+    .then((user) => {
+      return res.status(200).send(user);
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(422).send(req.body);
+    });
+};
+
+const patchUser = (req, res) => {
+  return UserModel.find(req.params.id)
+    .then((user) => {
+      return res.status(200).send(user);
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(422).send(req.body);
+    });
+};
+
+const patchUserAvatar = (req, res) => {
+  return UserModel.find(req.params.id)
+    .then((user) => {
+      return res.status(200).send(user);
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(422).send(req.body);
+    });
+};
+
+module.exports = {
+  getUsers,
+  getUserById,
+  createUser,
+  deleteUserById,
+  patchUser,
+  patchUserAvatar,
 };
