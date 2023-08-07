@@ -2,11 +2,24 @@ const http = require("http");
 const path = require("path");
 const express = require("express");
 const mongoose = require("mongoose");
-
-const { PORT = 3000, BASE_PATH } = process.env;
 const app = express();
+const port = 3000;
+const bodyParser = require('body-parser');
+
+const usersRouter = require('./routes/users');
+
+app.use(bodyParser.json());
+app.use(express.static(root:"public"));
 
 mongoose.connect("mongodb://localhost:27017/mynewdb");
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
+
+const { PORT = 3000, BASE_PATH } = process.env;
+
+
 app.use(express.static(path.join(__dirname, "public")));
 app.listen(PORT, () => {
   console.log("Ссылка на сервер");
@@ -16,6 +29,8 @@ app.listen(PORT, () => {
 const server = http.createServer(() => {
   console.log("Пришёл запрос!");
 });
+
+app.use(usersRouter);
 
 app.use((req, res, next) => {
   req.user = {
