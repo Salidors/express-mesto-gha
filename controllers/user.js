@@ -1,19 +1,16 @@
-const UserModel = require("../models/user");
+const UserModel = require('../models/user');
 
-const getUsers = (req, res) => {
-  return UserModel.find()
-    .then((user) => {
-      return res.status(201).send(user);
-    })
-    .catch((err) => res.status(500).send("Server Error"));
-};
+const getUsers = (req, res) =>
+  UserModel.find()
+    .then((user) => res.status(201).send(user))
+    .catch(() => res.status(500).send('Server Error'));
 
 const getUserById = (req, res) => {
   return UserModel.findById(req.params.id)
     .then((user) => {
       return res.status(200).send(user);
     })
-    .catch((err) => res.status(404).send("User not found"));
+    .catch((err) => res.status(404).send('User not found'));
 };
 
 const createUser = (req, res) => {
@@ -23,8 +20,8 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      if (err.name === "validationError") {
-        return res.status(400).send("validationError");
+      if (err.name === 'validationError') {
+        return res.status(400).send('validationError');
       }
       return res.status(422).send(req.body);
     });
