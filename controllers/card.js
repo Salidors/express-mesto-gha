@@ -1,56 +1,40 @@
-const UserModel = require('../models/card');
-
-module.exports.createCard = (req, res) => {
-  console.log(req.user._id); // _id станет доступен
-};
+const CardModel = require('../models/card');
+const UserModel = require('../models/user');
 
 const postCard =
   ('/',
   (req, res) => {
     const { name, link } = req.body; // получим из объекта запроса имя и описание пользователя
 
-    Card.create({ name, link })
+    CardModel.create({ name, link })
       // вернём записанные в базу данные
-      .then((link) => res.send({ data: link }))
+      .then((l) => res.send({ data: l }))
       // данные не записались, вернём ошибку
-      .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
+      .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
   });
 
 const postCardId =
   ('/:cardId',
   (req, res) => {
-    Card.findById(req.params._id)
+    CardModel.findById(req.params._id)
       .then((link) => res.send({ data: link }))
-      .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
+      .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
   });
 
-const getCard = (req, res) => {
-  Card.find({})
+const getCard = (req, res) =>
+  CardModel.find({})
     .then((link) => res.send({ data: link }))
-    .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
-};
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 
-const putLike = (req, res) => {
-  return UserModel.find(req.params.id)
-    .then((user) => {
-      return res.status(200).send(user);
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(422).send(req.body);
-    });
-};
+const putLike = (req, res) =>
+  UserModel.find(req.params.id)
+    .then((user) => res.status(200).send(user))
+    .catch(() => res.status(422).send(req.body));
 
-const deleteLike = (req, res) => {
-  return UserModel.find(req.params.id)
-    .then((user) => {
-      return res.status(200).send(user);
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(422).send(req.body);
-    });
-};
+const deleteLike = (req, res) =>
+  UserModel.find(req.params.id)
+    .then((user) => res.status(200).send(user))
+    .catch(() => res.status(422).send(req.body));
 
 module.exports = {
   postCard,

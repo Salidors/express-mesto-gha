@@ -8,6 +8,8 @@
           "_id"
         ]
       }
-    ]
+    ],
+    "implicit-arrow-linebreak" :"off",
+    "operator-linebreak": "off"
   }
 }
