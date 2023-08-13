@@ -3,13 +3,20 @@ const { errorStatus } = require('../constants/errors');
 
 const getUsers = (req, res) =>
   UserModel.find()
-    .then((user) => res.status(errorStatus.created).send(user))
+    .then((users) => {
+      if (!users || !users.length) {
+        res.status(errorStatus.notFound).send(errorStatus.NotFound);
+        return;
+      }
+
+      res.status(errorStatus.created).send(users);
+    })
     .catch(() => res.status(errorStatus.serverError).send('Server Error'));
 
 const getUserById = (req, res) =>
   UserModel.findById(req.params.id)
     .then((user) => res.status(errorStatus.ok).send(user))
-    .catch(() => res.status(errorStatus.CastError).send('User not found'));
+    .catch(() => res.status(errorStatus.notFound).send(errorStatus.NotFound));
 
 const createUser = (req, res) =>
   UserModel.create({ ...req.body })
@@ -21,26 +28,35 @@ const createUser = (req, res) =>
       return res.status(errorStatus.UnprocessableEntity).send(req.body);
     });
 
-const deleteUserById = (req, res) =>
-  UserModel.findByIdAndRemove(req.params.id)
-    .then((user) => res.status(errorStatus.ok).send(user))
+const patchUser = (req, res) => {
+  const { id, about } = req.body;
+  UserModel.findByIdAndUpdate(id, { about })
+    .then((user) => {
+      if (!user) {
+        res.status(errorStatus.notFound).send(errorStatus.NotFound);
+        return;
+      }
+      res.send(user);
+    })
     .catch(() => res.status(errorStatus.UnprocessableEntity).send(req.body));
+};
 
-const patchUser = (req, res) =>
-  UserModel.find(req.params.id)
-    .then((user) => res.status(errorStatus.ok).send(user))
+const patchUserAvatar = (req, res) => {
+  const { id, avatar } = req.body;
+  UserModel.findById(id, { avatar })
+    .then((user) => {
+      if (!user) {
+        res.status(errorStatus.notFound).send(errorStatus.NotFound);
+        return;
+      }
+      res.send(user);
+    })
     .catch(() => res.status(errorStatus.UnprocessableEntity).send(req.body));
-
-const patchUserAvatar = (req, res) =>
-  UserModel.find(req.params.id)
-    .then((user) => res.status(errorStatus.ok).send(user))
-    .catch(() => res.status(errorStatus.UnprocessableEntity).send(req.body));
-
+};
 module.exports = {
   getUsers,
   getUserById,
   createUser,
-  deleteUserById,
   patchUser,
   patchUserAvatar,
 };

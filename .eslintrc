@@ -10,6 +10,9 @@
       }
     ],
     "implicit-arrow-linebreak" :"off",
-    "operator-linebreak": "off"
+    "operator-linebreak": "off",
+    "comma-dangle": "off",
+    "function-paren-newline": "off",
+    "object-curly-newline": "off"
   }
 }

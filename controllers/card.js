@@ -1,45 +1,63 @@
 const CardModel = require('../models/card');
-const UserModel = require('../models/user');
+const { errorStatus } = require('../constants/errors');
 
-const postCard =
-  ('/',
-  (req, res) => {
-    const { name, link } = req.body; // получим из объекта запроса имя и описание пользователя
+const postCard = (req, res) => {
+  const { name, link, owner } = req.body;
+  CardModel.create({ name, link, owner })
+    .then((card) => res.send({ data: card }))
+    .catch(() =>
+      res.status(errorStatus.serverError).send(errorStatus.BadRequest)
+    );
+};
 
-    CardModel.create({ name, link })
-      // вернём записанные в базу данные
-      .then((l) => res.send({ data: l }))
-      // данные не записались, вернём ошибку
-      .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-  });
+const getCards = (req, res) =>
+  CardModel.find()
+    .then((cards) => {
+      if (!cards || !cards.length) {
+        res.status(errorStatus.notFound).send(errorStatus.NotFound);
+        return;
+      }
+      res.send({ data: cards });
+    })
+    .catch(() =>
+      res.status(errorStatus.serverError).send(errorStatus.BadRequest)
+    );
 
-const postCardId =
-  ('/:cardId',
-  (req, res) => {
-    CardModel.findById(req.params._id)
-      .then((link) => res.send({ data: link }))
-      .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-  });
+const putLike = (req, res) => {
+  const { cardId } = req.params;
+  const { userId } = req.body;
+  CardModel.findByIdAndUpdate(cardId, {
+    $push: { likes: userId },
+  })
+    .then((card) => res.status(errorStatus.ok).send(card))
+    .catch(() => res.status(errorStatus.UnprocessableEntity).send(req.body));
+};
 
-const getCard = (req, res) =>
-  CardModel.find({})
-    .then((link) => res.send({ data: link }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+const deleteLike = (req, res) => {
+  const { cardId } = req.params;
+  const { userId } = req.body;
+  CardModel.findByIdAndUpdate(cardId, {
+    $pull: { likes: userId._id },
+  })
+    .then((card) => res.status(errorStatus.ok).send(card))
+    .catch(() => res.status(errorStatus.UnprocessableEntity).send(req.body));
+};
 
-const putLike = (req, res) =>
-  UserModel.find(req.params.id)
-    .then((user) => res.status(200).send(user))
-    .catch(() => res.status(422).send(req.body));
-
-const deleteLike = (req, res) =>
-  UserModel.find(req.params.id)
-    .then((user) => res.status(200).send(user))
-    .catch(() => res.status(422).send(req.body));
+const deleteCard = (req, res) =>
+  CardModel.findByIdAndRemove(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        res.status(errorStatus.notFound).send(errorStatus.NotFound);
+        return;
+      }
+      res.status(errorStatus.ok).send({ data: card });
+    })
+    .catch(() => res.status(errorStatus.UnprocessableEntity).send(req.body));
 
 module.exports = {
   postCard,
-  postCardId,
-  getCard,
+  getCards,
   putLike,
   deleteLike,
+  deleteCard,
 };
