@@ -14,6 +14,7 @@ const getUsers = (req, res, next) =>
 
 const getUserById = (req, res, next) =>
   UserModel.findById(req.params.id)
+    .orFail()
     .then((user) => {
       if (!user) {
         return res
@@ -54,6 +55,7 @@ const createUser = (req, res, next) =>
 const patchUser = (req, res, next) => {
   const { id, name, about } = req.body;
   UserModel.findByIdAndUpdate(id, { name, about }, { new: true })
+    .orFail()
     .then((user) => {
       if (!user) {
         return res
@@ -78,6 +80,7 @@ const patchUser = (req, res, next) => {
 const patchUserAvatar = (req, res, next) => {
   const { id, avatar } = req.body;
   UserModel.findById(id, { avatar }, { new: true })
+    .orFail()
     .then((user) => {
       if (!user) {
         return res

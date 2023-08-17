@@ -41,6 +41,7 @@ const putLike = (req, res, next) => {
     },
     { new: true }
   )
+    .orFail()
     .then(() => res.status(constants.HTTP_STATUS_OK).send('Карточка лайкнута'))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -66,6 +67,7 @@ const deleteLike = (req, res, next) => {
     },
     { new: true }
   )
+    .orFail()
     .then((card) => {
       if (card.likes.some((l) => l === userId._id)) {
         return res.status(constants.HTTP_STATUS_OK).send('Удалили лайк');
@@ -87,6 +89,7 @@ const deleteLike = (req, res, next) => {
 
 const deleteCard = (req, res, next) =>
   CardModel.findByIdAndRemove(req.params.cardId)
+    .orFail()
     .then((card) => {
       if (!card) {
         return res
