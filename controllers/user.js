@@ -1,57 +1,102 @@
+const { constants } = require('http2');
+
 const UserModel = require('../models/user');
-const { errorStatus } = require('../constants/errors');
 
-const getUsers = (req, res) =>
+const getUsers = (req, res, next) =>
   UserModel.find()
-    .then((users) => {
-      if (!users || !users.length) {
-        res.status(errorStatus.notFound).send(errorStatus.NotFound);
-        return;
-      }
-
-      res.status(errorStatus.created).send(users);
-    })
-    .catch(() => res.status(errorStatus.serverError).send('Server Error'));
-
-const getUserById = (req, res) =>
-  UserModel.findById(req.params.id)
-    .then((user) => res.status(errorStatus.ok).send(user))
-    .catch(() => res.status(errorStatus.notFound).send(errorStatus.NotFound));
-
-const createUser = (req, res) =>
-  UserModel.create({ ...req.body })
-    .then((user) => res.status(errorStatus.created).send(user))
+    .then((users) => res.send(users))
     .catch((err) => {
-      if (err.name === 'validationError') {
-        return res.status(errorStatus.BadRequest).send('validationError');
-      }
-      return res.status(errorStatus.UnprocessableEntity).send(req.body);
+      res
+        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+        .send('Не удалось загрузить карточки');
+      return next(err);
     });
 
-const patchUser = (req, res) => {
+const getUserById = (req, res, next) =>
+  UserModel.findById(req.params.id)
+    .then((user) => {
+      if (!user) {
+        return res
+          .status(constants.HTTP_STATUS_NOT_FOUND)
+          .send('Пользователь не найден');
+      }
+      return res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res
+          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
+          .send('Неверный идентификатор пользователя');
+      }
+
+      res
+        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+        .send('Не удалось загрузить пользователя');
+      return next(err);
+    });
+
+const createUser = (req, res, next) =>
+  UserModel.create({ ...req.body })
+    .then((user) => res.status(constants.HTTP_STATUS_CREATED).send(user))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res
+          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
+          .send('Неверно заполнены поля');
+      }
+
+      res
+        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+        .send('Не удалось создать пользователя');
+      return next(err);
+    });
+
+const patchUser = (req, res, next) => {
   const { id, about } = req.body;
   UserModel.findByIdAndUpdate(id, { about })
     .then((user) => {
       if (!user) {
-        res.status(errorStatus.notFound).send(errorStatus.NotFound);
-        return;
+        return res
+          .status(constants.HTTP_STATUS_NOT_FOUND)
+          .send('Пользователь не найден');
       }
-      res.send(user);
+      return res.send(user);
     })
-    .catch(() => res.status(errorStatus.UnprocessableEntity).send(req.body));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res
+          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
+          .send('Неверный идентификатор пользователя');
+      }
+      res
+        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+        .send('Не удалось обновить информацию о пользователе');
+      return next(err);
+    });
 };
 
-const patchUserAvatar = (req, res) => {
+const patchUserAvatar = (req, res, next) => {
   const { id, avatar } = req.body;
   UserModel.findById(id, { avatar })
     .then((user) => {
       if (!user) {
-        res.status(errorStatus.notFound).send(errorStatus.NotFound);
-        return;
+        return res
+          .status(constants.HTTP_STATUS_NOT_FOUND)
+          .send('Пользователь не найден');
       }
-      res.send(user);
+      return res.send(user);
     })
-    .catch(() => res.status(errorStatus.UnprocessableEntity).send(req.body));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res
+          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
+          .send('Неверный идентификатор пользователя');
+      }
+      res
+        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+        .send('Не удалось обновить аватар пользователя');
+      return next(err);
+    });
 };
 module.exports = {
   getUsers,
