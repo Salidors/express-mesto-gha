@@ -8,7 +8,7 @@ const getUsers = (req, res, next) =>
     .catch((err) => {
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Не удалось загрузить карточки');
+        .send('Не удалось загрузить данные пользователя');
       return next(err);
     });
 
@@ -52,8 +52,8 @@ const createUser = (req, res, next) =>
     });
 
 const patchUser = (req, res, next) => {
-  const { id, about } = req.body;
-  UserModel.findByIdAndUpdate(id, { about })
+  const { id, name, about } = req.body;
+  UserModel.findByIdAndUpdate(id, { name, about }, { new: true })
     .then((user) => {
       if (!user) {
         return res
@@ -77,7 +77,7 @@ const patchUser = (req, res, next) => {
 
 const patchUserAvatar = (req, res, next) => {
   const { id, avatar } = req.body;
-  UserModel.findById(id, { avatar })
+  UserModel.findById(id, { avatar }, { new: true })
     .then((user) => {
       if (!user) {
         return res

@@ -34,9 +34,13 @@ const getCards = (req, res, next) =>
 const putLike = (req, res, next) => {
   const { cardId } = req.params;
   const { userId } = req.body;
-  CardModel.findByIdAndUpdate(cardId, {
-    $push: { likes: userId },
-  })
+  CardModel.findByIdAndUpdate(
+    cardId,
+    {
+      $push: { likes: userId },
+    },
+    { new: true }
+  )
     .then(() => res.status(constants.HTTP_STATUS_OK).send('Карточка лайкнута'))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -55,9 +59,13 @@ const putLike = (req, res, next) => {
 const deleteLike = (req, res, next) => {
   const { cardId } = req.params;
   const { userId } = req.body;
-  CardModel.findByIdAndUpdate(cardId, {
-    $pull: { likes: userId._id },
-  })
+  CardModel.findByIdAndUpdate(
+    cardId,
+    {
+      $pull: { likes: userId._id },
+    },
+    { new: true }
+  )
     .then((card) => {
       if (card.likes.some((l) => l === userId._id)) {
         return res.status(constants.HTTP_STATUS_OK).send('Удалили лайк');
