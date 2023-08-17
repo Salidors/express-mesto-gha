@@ -15,15 +15,14 @@ const getUsers = (req, res, next) =>
 const getUserById = (req, res, next) =>
   UserModel.findById(req.params.id)
     .orFail()
-    .then((user) => {
-      if (!user) {
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
         return res
           .status(constants.HTTP_STATUS_NOT_FOUND)
           .send('Пользователь не найден');
       }
-      return res.send(user);
-    })
-    .catch((err) => {
+
       if (err.name === 'CastError') {
         return res
           .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
@@ -43,7 +42,7 @@ const createUser = (req, res, next) =>
       if (err.name === 'ValidationError') {
         return res
           .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
-          .send('Неверно заполнены поля');
+          .send(err.message);
       }
 
       res
@@ -54,22 +53,30 @@ const createUser = (req, res, next) =>
 
 const patchUser = (req, res, next) => {
   const { id, name, about } = req.body;
-  UserModel.findByIdAndUpdate(id, { name, about }, { new: true })
+  UserModel.findByIdAndUpdate(
+    id,
+    { name, about },
+    { new: true, runValidators: true }
+  )
     .orFail()
-    .then((user) => {
-      if (!user) {
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
         return res
           .status(constants.HTTP_STATUS_NOT_FOUND)
           .send('Пользователь не найден');
       }
-      return res.send(user);
-    })
-    .catch((err) => {
+
+      if (err.name === 'ValidationError') {
+        return res.status(constants.HTTP_STATUS_BAD_REQUEST).send(err.message);
+      }
+
       if (err.name === 'CastError') {
         return res
           .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
           .send('Неверный идентификатор пользователя');
       }
+
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
         .send('Не удалось обновить информацию о пользователе');
@@ -79,17 +86,20 @@ const patchUser = (req, res, next) => {
 
 const patchUserAvatar = (req, res, next) => {
   const { id, avatar } = req.body;
-  UserModel.findById(id, { avatar }, { new: true })
+  UserModel.findById(id, { avatar }, { new: true, runValidators: true })
     .orFail()
-    .then((user) => {
-      if (!user) {
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
         return res
           .status(constants.HTTP_STATUS_NOT_FOUND)
           .send('Пользователь не найден');
       }
-      return res.send(user);
-    })
-    .catch((err) => {
+
+      if (err.name === 'ValidationError') {
+        return res.status(constants.HTTP_STATUS_BAD_REQUEST).send(err.message);
+      }
+
       if (err.name === 'CastError') {
         return res
           .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)

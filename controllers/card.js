@@ -44,6 +44,12 @@ const putLike = (req, res, next) => {
     .orFail()
     .then(() => res.status(constants.HTTP_STATUS_OK).send('Карточка лайкнута'))
     .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        return res
+          .status(constants.HTTP_STATUS_NOT_FOUND)
+          .send('Карточка не найдена');
+      }
+
       if (err.name === 'CastError') {
         return res
           .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
@@ -68,13 +74,14 @@ const deleteLike = (req, res, next) => {
     { new: true }
   )
     .orFail()
-    .then((card) => {
-      if (card.likes.some((l) => l === userId._id)) {
-        return res.status(constants.HTTP_STATUS_OK).send('Удалили лайк');
-      }
-      return res.status(constants.HTTP_STATUS_NOT_FOUND).send('Не нашли лайк');
-    })
+    .then(() => res.status(constants.HTTP_STATUS_OK).send('Удалили лайк'))
     .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        return res
+          .status(constants.HTTP_STATUS_NOT_FOUND)
+          .send('Карточка не найдена');
+      }
+
       if (err.name === 'CastError') {
         return res
           .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
@@ -90,15 +97,14 @@ const deleteLike = (req, res, next) => {
 const deleteCard = (req, res, next) =>
   CardModel.findByIdAndRemove(req.params.cardId)
     .orFail()
-    .then((card) => {
-      if (!card) {
+    .then(() => res.status(constants.HTTP_STATUS_OK).send('Карта удалена'))
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
         return res
           .status(constants.HTTP_STATUS_NOT_FOUND)
-          .send('Не удалось найти карточку');
+          .send('Карточка не найдена');
       }
-      return res.status(constants.HTTP_STATUS_OK).send('Карта удалена');
-    })
-    .catch((err) => {
+
       if (err.name === 'CastError') {
         return res
           .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
