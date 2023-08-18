@@ -12,8 +12,15 @@ app.use(express.json());
 app.use(usersRouter);
 app.use(cardsRouter);
 app.use((req, res, next) => {
+  req.user = {
+    _id: '64d888973555e99e007b772c',
+  };
+
+  next();
+});
+app.use((req, res, next) => {
   res.status(constants.HTTP_STATUS_NOT_FOUND).send('Тут ничего нет');
-  return next();
+  next();
 });
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
