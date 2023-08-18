@@ -11,12 +11,12 @@ const postCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res
-          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
-          .send('Неверно заполнены поля');
+          .status(constants.HTTP_STATUS_BAD_REQUEST)
+          .send({ message: 'Неверно заполнены поля' });
       }
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Не удалось создать карточку');
+        .send({ message: 'Не удалось создать карточку' });
       return next(err);
     });
 };
@@ -42,23 +42,27 @@ const putLike = (req, res, next) => {
     { new: true }
   )
     .orFail()
-    .then(() => res.status(constants.HTTP_STATUS_OK).send('Карточка лайкнута'))
+    .then(() =>
+      res
+        .status(constants.HTTP_STATUS_OK)
+        .send({ message: 'Карточка лайкнута' })
+    )
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         return res
           .status(constants.HTTP_STATUS_NOT_FOUND)
-          .send('Карточка не найдена');
+          .send({ message: 'Карточка не найдена' });
       }
 
       if (err.name === 'CastError') {
         return res
-          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
-          .send('Неверный формат данных');
+          .status(constants.HTTP_STATUS_BAD_REQUEST)
+          .send({ message: 'Неверный формат данных' });
       }
 
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Нет возможности поставить like');
+        .send({ message: 'Нет возможности поставить like' });
       return next(err);
     });
 };
@@ -74,22 +78,24 @@ const deleteLike = (req, res, next) => {
     { new: true }
   )
     .orFail()
-    .then(() => res.status(constants.HTTP_STATUS_OK).send('Удалили лайк'))
+    .then(() =>
+      res.status(constants.HTTP_STATUS_OK).send({ message: 'Удалили лайк' })
+    )
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         return res
           .status(constants.HTTP_STATUS_NOT_FOUND)
-          .send('Карточка не найдена');
+          .send({ message: 'Карточка не найдена' });
       }
 
       if (err.name === 'CastError') {
         return res
-          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
-          .send('Неверный формат данных');
+          .status(constants.HTTP_STATUS_BAD_REQUEST)
+          .send({ message: 'Неверный формат данных' });
       }
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Нет возможности удалить Like');
+        .send({ message: 'Нет возможности удалить Like' });
       return next(err);
     });
 };
@@ -107,7 +113,7 @@ const deleteCard = (req, res, next) =>
 
       if (err.name === 'CastError') {
         return res
-          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
+          .status(constants.HTTP_STATUS_BAD_REQUEST)
           .send('Неверный идентификатора карточки');
       }
       res

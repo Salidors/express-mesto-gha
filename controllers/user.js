@@ -8,7 +8,7 @@ const getUsers = (req, res, next) =>
     .catch((err) => {
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Не удалось загрузить данные пользователя');
+        .send({ message: 'Не удалось загрузить данные пользователя' });
       return next(err);
     });
 
@@ -25,7 +25,7 @@ const getUserById = (req, res, next) =>
 
       if (err.name === 'CastError') {
         return res
-          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
+          .status(constants.HTTP_STATUS_BAD_REQUEST)
           .send('Неверный идентификатор пользователя');
       }
 
@@ -41,13 +41,13 @@ const createUser = (req, res, next) =>
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res
-          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
-          .send(err.message);
+          .status(constants.HTTP_STATUS_BAD_REQUEST)
+          .send({ message: err.message });
       }
 
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Не удалось создать пользователя');
+        .send({ message: 'Не удалось создать пользователя' });
       return next(err);
     });
 
@@ -68,12 +68,14 @@ const patchUser = (req, res, next) => {
       }
 
       if (err.name === 'ValidationError') {
-        return res.status(constants.HTTP_STATUS_BAD_REQUEST).send(err.message);
+        return res
+          .status(constants.HTTP_STATUS_BAD_REQUEST)
+          .send({ message: err.message });
       }
 
       if (err.name === 'CastError') {
         return res
-          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
+          .status(constants.HTTP_STATUS_BAD_REQUEST)
           .send('Неверный идентификатор пользователя');
       }
 
@@ -93,21 +95,23 @@ const patchUserAvatar = (req, res, next) => {
       if (err.name === 'DocumentNotFoundError') {
         return res
           .status(constants.HTTP_STATUS_NOT_FOUND)
-          .send('Пользователь не найден');
+          .send({ message: 'Пользователь не найден' });
       }
 
       if (err.name === 'ValidationError') {
-        return res.status(constants.HTTP_STATUS_BAD_REQUEST).send(err.message);
+        return res
+          .status(constants.HTTP_STATUS_BAD_REQUEST)
+          .send({ message: err.message });
       }
 
       if (err.name === 'CastError') {
         return res
-          .status(constants.HTTP_STATUS_UNPROCESSABLE_ENTITY)
-          .send('Неверный идентификатор пользователя');
+          .status(constants.HTTP_STATUS_BAD_REQUEST)
+          .send({ message: 'Неверный идентификатор пользователя' });
       }
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Не удалось обновить аватар пользователя');
+        .send({ message: 'Не удалось обновить аватар пользователя' });
       return next(err);
     });
 };
