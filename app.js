@@ -19,7 +19,9 @@ app.use((req, res, next) => {
 app.use(usersRouter);
 app.use(cardsRouter);
 app.use((req, res, next) => {
-  res.status(constants.HTTP_STATUS_NOT_FOUND).send('Тут ничего нет');
+  res
+    .status(constants.HTTP_STATUS_NOT_FOUND)
+    .send({ message: 'Тут ничего нет' });
   next();
 });
 
