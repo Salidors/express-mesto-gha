@@ -3,7 +3,9 @@ const { constants } = require('http2');
 const CardModel = require('../models/card');
 
 const postCard = (req, res, next) => {
-  const { name, link, owner } = req.body;
+  const { name, link } = req.body;
+  const owner = '64d888973555e99e007b772c';
+
   CardModel.create({ name, link, owner })
     .then((card) =>
       res.status(constants.HTTP_STATUS_CREATED).send({ data: card })
@@ -33,7 +35,8 @@ const getCards = (req, res, next) =>
 
 const putLike = (req, res, next) => {
   const { cardId } = req.params;
-  const { userId } = req.body;
+  const userId = '64d888973555e99e007b772c';
+
   CardModel.findByIdAndUpdate(
     cardId,
     {
@@ -69,11 +72,12 @@ const putLike = (req, res, next) => {
 
 const deleteLike = (req, res, next) => {
   const { cardId } = req.params;
-  const { userId } = req.body;
+  const userId = '64d888973555e99e007b772c';
+
   CardModel.findByIdAndUpdate(
     cardId,
     {
-      $pull: { likes: userId._id },
+      $pull: { likes: userId },
     },
     { new: true }
   )

@@ -52,7 +52,8 @@ const createUser = (req, res, next) =>
     });
 
 const patchUser = (req, res, next) => {
-  const { id, name, about } = req.body;
+  const { name, about } = req.body;
+  const id = '64d888973555e99e007b772c';
   UserModel.findByIdAndUpdate(
     id,
     { name, about },
@@ -87,7 +88,9 @@ const patchUser = (req, res, next) => {
 };
 
 const patchUserAvatar = (req, res, next) => {
-  const { id, avatar } = req.body;
+  const { avatar } = req.body;
+  const id = '64d888973555e99e007b772c';
+
   UserModel.findById(id, { avatar }, { new: true, runValidators: true })
     .orFail()
     .then((user) => res.send(user))
