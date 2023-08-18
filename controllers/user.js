@@ -20,18 +20,18 @@ const getUserById = (req, res, next) =>
       if (err.name === 'DocumentNotFoundError') {
         return res
           .status(constants.HTTP_STATUS_NOT_FOUND)
-          .send('Пользователь не найден');
+          .send({ message: 'Пользователь не найден' });
       }
 
       if (err.name === 'CastError') {
         return res
           .status(constants.HTTP_STATUS_BAD_REQUEST)
-          .send('Неверный идентификатор пользователя');
+          .send({ message: 'Неверный идентификатор пользователя' });
       }
 
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Не удалось загрузить пользователя');
+        .send({ message: 'Не удалось загрузить пользователя' });
       return next(err);
     });
 
@@ -64,7 +64,7 @@ const patchUser = (req, res, next) => {
       if (err.name === 'DocumentNotFoundError') {
         return res
           .status(constants.HTTP_STATUS_NOT_FOUND)
-          .send('Пользователь не найден');
+          .send({ message: 'Пользователь не найден' });
       }
 
       if (err.name === 'ValidationError') {
@@ -76,12 +76,12 @@ const patchUser = (req, res, next) => {
       if (err.name === 'CastError') {
         return res
           .status(constants.HTTP_STATUS_BAD_REQUEST)
-          .send('Неверный идентификатор пользователя');
+          .send({ message: 'Неверный идентификатор пользователя' });
       }
 
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Не удалось обновить информацию о пользователе');
+        .send({ message: 'Не удалось обновить информацию о пользователе' });
       return next(err);
     });
 };

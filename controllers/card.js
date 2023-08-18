@@ -27,7 +27,7 @@ const getCards = (req, res, next) =>
     .catch((err) => {
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Не удалось загрузить карточки');
+        .send({ message: 'Не удалось загрузить карточки' });
       return next(err);
     });
 
@@ -78,9 +78,7 @@ const deleteLike = (req, res, next) => {
     { new: true }
   )
     .orFail()
-    .then(() =>
-      res.status(constants.HTTP_STATUS_OK).send({ message: 'Удалили лайк' })
-    )
+    .then(() => res.send({ message: 'Удалили лайк' }))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         return res
@@ -103,22 +101,24 @@ const deleteLike = (req, res, next) => {
 const deleteCard = (req, res, next) =>
   CardModel.findByIdAndRemove(req.params.cardId)
     .orFail()
-    .then(() => res.status(constants.HTTP_STATUS_OK).send('Карта удалена'))
+    .then(() =>
+      res.status(constants.HTTP_STATUS_OK).send({ message: 'Карта удалена' })
+    )
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         return res
           .status(constants.HTTP_STATUS_NOT_FOUND)
-          .send('Карточка не найдена');
+          .send({ message: 'Карточка не найдена' });
       }
 
       if (err.name === 'CastError') {
         return res
           .status(constants.HTTP_STATUS_BAD_REQUEST)
-          .send('Неверный идентификатора карточки');
+          .send({ message: 'Неверный идентификатора карточки' });
       }
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send('Вы не можете удалить эту карточку');
+        .send({ message: 'Вы не можете удалить эту карточку' });
       return next(err);
     });
 
