@@ -4,7 +4,7 @@ const CardModel = require('../models/card');
 
 const postCard = (req, res, next) => {
   const { name, link } = req.body;
-  const owner = '64d888973555e99e007b772c';
+  const owner = req.user._id;
 
   CardModel.create({ name, link, owner })
     .then((card) =>
@@ -35,7 +35,7 @@ const getCards = (req, res, next) =>
 
 const putLike = (req, res, next) => {
   const { cardId } = req.params;
-  const userId = '64d888973555e99e007b772c';
+  const userId = req.user._id;
 
   CardModel.findByIdAndUpdate(
     cardId,
@@ -72,7 +72,7 @@ const putLike = (req, res, next) => {
 
 const deleteLike = (req, res, next) => {
   const { cardId } = req.params;
-  const userId = '64d888973555e99e007b772c';
+  const userId = req.user._id;
 
   CardModel.findByIdAndUpdate(
     cardId,
