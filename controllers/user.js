@@ -2,6 +2,16 @@ const { constants } = require('http2');
 
 const UserModel = require('../models/user');
 
+const login = (req, res, next) =>
+  UserModel.find()
+    .then((users) => res.send(users))
+    .catch((err) => {
+      res
+        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+        .send({ message: 'Не верный логин или пароль' });
+      return next(err);
+    });
+
 const getUsers = (req, res, next) =>
   UserModel.find()
     .then((users) => res.send(users))
@@ -124,4 +134,5 @@ module.exports = {
   createUser,
   patchUser,
   patchUserAvatar,
+  login,
 };

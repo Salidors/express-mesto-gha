@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { default: isEmail } = require('validator/lib/isEmail');
+const { default: isEmail } = require('validator/es/lib/isEmail');
 
 const userSchema = new mongoose.Schema({
   name: {
