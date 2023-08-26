@@ -8,6 +8,7 @@ const login = (req, res) => {
   const { email, password } = req.body;
 
   UserModel.findOne({ email })
+    .select('+password')
     .then(async (user) => {
       if (!user) {
         return Promise.reject(new Error('Неправильные почта или пароль'));
