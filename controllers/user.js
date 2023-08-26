@@ -39,6 +39,16 @@ const getUsers = (req, res, next) =>
       return next(err);
     });
 
+const getUser = (req, res, next) =>
+  UserModel.findById(req.user._id)
+    .then((user) => res.send(user))
+    .catch((err) => {
+      res
+        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+        .send({ message: 'Не удалось загрузить данные пользователя' });
+      return next(err);
+    });
+
 const getUserById = (req, res, next) =>
   UserModel.findById(req.params.id)
     .orFail()
@@ -159,4 +169,5 @@ module.exports = {
   patchUser,
   patchUserAvatar,
   login,
+  getUser,
 };
