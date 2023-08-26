@@ -1,4 +1,5 @@
 const { constants } = require('http2');
+const bcrypt = require('bcryptjs');
 
 const UserModel = require('../models/user');
 
@@ -45,8 +46,13 @@ const getUserById = (req, res, next) =>
       return next(err);
     });
 
-const createUser = (req, res, next) =>
-  UserModel.create({ ...req.body })
+const createUser = (req, res, next) => {
+  const { email, name, about, avatar, password } = req.body;
+  bcrypt
+    .hash(password, 10)
+    .then((hash) =>
+      UserModel.create({ email, name, about, avatar, password: hash })
+    )
     .then((user) => res.status(constants.HTTP_STATUS_CREATED).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -60,6 +66,7 @@ const createUser = (req, res, next) =>
         .send({ message: 'Не удалось создать пользователя' });
       return next(err);
     });
+};
 
 const patchUser = (req, res, next) => {
   const { name, about } = req.body;
@@ -128,6 +135,7 @@ const patchUserAvatar = (req, res, next) => {
       return next(err);
     });
 };
+
 module.exports = {
   getUsers,
   getUserById,
