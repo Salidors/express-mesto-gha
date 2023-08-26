@@ -24,13 +24,13 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'Неоюходимо заполнить Email'],
+    required: [true, 'Необходимо заполнить Email'],
     validator: isEmail('foo@bar.com'),
     unique: true,
   },
   password: {
     type: String,
-    required: [true, 'Неоюходимо заполнить Email'], // hash
+    required: [true, 'Необходимо заполнить Email'], // hash
   },
 });
 
