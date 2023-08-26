@@ -3,15 +3,29 @@ const bcrypt = require('bcryptjs');
 
 const UserModel = require('../models/user');
 
-const login = (req, res, next) =>
-  UserModel.find()
-    .then((users) => res.send(users))
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  UserModel.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+      return bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+
+      res.send({ message: 'Пользователь авторизован!' });
+    })
     .catch((err) => {
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Не верный логин или пароль' });
-      return next(err);
+        .send({ message: err.message });
     });
+};
 
 const getUsers = (req, res, next) =>
   UserModel.find()
