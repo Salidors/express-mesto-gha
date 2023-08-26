@@ -1,5 +1,6 @@
 const { constants } = require('http2');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const UserModel = require('../models/user');
 
@@ -7,19 +8,28 @@ const login = (req, res) => {
   const { email, password } = req.body;
 
   UserModel.findOne({ email })
-    .then((user) => {
+    .then(async (user) => {
       if (!user) {
         return Promise.reject(new Error('Неправильные почта или пароль'));
       }
-      return bcrypt.compare(password, user.password);
-    })
-    .then((matched) => {
+      const matched = await bcrypt.compare(password, user.password);
       if (!matched) {
         return Promise.reject(new Error('Неправильные почта или пароль'));
       }
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
+        expiresIn: '1w',
+      });
 
-      res.send({ message: 'Пользователь авторизован!' });
+      res.send({ token });
     })
+    // .then((matched) => {
+    //   if (!matched) {
+    //     return Promise.reject(new Error('Неправильные почта или пароль'));
+    //   }
+    //   const token = jwt.sign({ _id: user._id }, 'some-secret-key');
+
+    //   res.send({ message: 'Пользователь авторизован!' });
+    // })
     .catch((err) => {
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
