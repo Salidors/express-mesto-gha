@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const UserModel = require('../models/user');
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   UserModel.findOne({ email })
@@ -23,30 +23,28 @@ const login = (req, res) => {
 
       res.send({ token });
     })
-    .catch((err) => {
-      res
-        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: err.message });
+    .catch((e) => {
+      const err = new Error(e.message);
+      err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+      return next(err);
     });
 };
 
 const getUsers = (req, res, next) =>
   UserModel.find()
     .then((users) => res.send(users))
-    .catch((err) => {
-      res
-        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Не удалось загрузить данные пользователя' });
+    .catch(() => {
+      const err = new Error('Не удалось загрузить данные пользователя');
+      err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
       return next(err);
     });
 
 const getUser = (req, res, next) =>
   UserModel.findById(req.user._id)
     .then((user) => res.send(user))
-    .catch((err) => {
-      res
-        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Не удалось загрузить данные пользователя' });
+    .catch(() => {
+      const err = new Error('Не удалось загрузить данные пользователя');
+      err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
       return next(err);
     });
 
@@ -54,22 +52,18 @@ const getUserById = (req, res, next) =>
   UserModel.findById(req.params.id)
     .orFail()
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(constants.HTTP_STATUS_NOT_FOUND)
-          .send({ message: 'Пользователь не найден' });
+    .catch((e) => {
+      let err;
+      if (e.name === 'DocumentNotFoundError') {
+        err = new Error('Пользователь не найден');
+        err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
+      } else if (e.name === 'CastError') {
+        err = new Error('Неверный идентификатор пользователя');
+        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+      } else {
+        err = new Error('Не удалось загрузить пользователя');
+        err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
       }
-
-      if (err.name === 'CastError') {
-        return res
-          .status(constants.HTTP_STATUS_BAD_REQUEST)
-          .send({ message: 'Неверный идентификатор пользователя' });
-      }
-
-      res
-        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Не удалось загрузить пользователя' });
       return next(err);
     });
 
@@ -81,16 +75,18 @@ const createUser = (req, res, next) => {
       UserModel.create({ email, name, about, avatar, password: hash })
     )
     .then((user) => res.status(constants.HTTP_STATUS_CREATED).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res
-          .status(constants.HTTP_STATUS_BAD_REQUEST)
-          .send({ message: err.message });
+    .catch((e) => {
+      let err;
+      if (e.name === 'ValidationError') {
+        err = new Error('Ошибка валидации');
+        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+      } else if (e.code === 11000) {
+        err = new Error('Емейл уже занят');
+        err.statusCode = constants.HTTP_STATUS_UNAUTHORIZED;
+      } else {
+        err = new Error('Не удалось создать пользователя');
+        err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
       }
-
-      res
-        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Не удалось создать пользователя' });
       return next(err);
     });
 };
@@ -105,29 +101,22 @@ const patchUser = (req, res, next) => {
   )
     .orFail()
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(constants.HTTP_STATUS_NOT_FOUND)
-          .send({ message: 'Пользователь не найден' });
+    .catch((e) => {
+      let err;
+      if (e.name === 'DocumentNotFoundError') {
+        err = new Error('Пользователь не найден');
+        err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
+      } else if (e.name === 'ValidationError') {
+        err = new Error(e.message);
+        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+      } else if (e.name === 'CastError') {
+        err = new Error('Неверный идентификатор пользователя');
+        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+      } else {
+        err = new Error('Не удалось обновить информацию о пользователе');
+        err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
       }
-
-      if (err.name === 'ValidationError') {
-        return res
-          .status(constants.HTTP_STATUS_BAD_REQUEST)
-          .send({ message: err.message });
-      }
-
-      if (err.name === 'CastError') {
-        return res
-          .status(constants.HTTP_STATUS_BAD_REQUEST)
-          .send({ message: 'Неверный идентификатор пользователя' });
-      }
-
-      res
-        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Не удалось обновить информацию о пользователе' });
-      return next(err);
+      return next(e);
     });
 };
 
@@ -138,28 +127,22 @@ const patchUserAvatar = (req, res, next) => {
   UserModel.findById(id, { avatar }, { new: true, runValidators: true })
     .orFail()
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(constants.HTTP_STATUS_NOT_FOUND)
-          .send({ message: 'Пользователь не найден' });
+    .catch((e) => {
+      let err;
+      if (e.name === 'DocumentNotFoundError') {
+        err = new Error('Пользователь не найден');
+        err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
+      } else if (e.name === 'ValidationError') {
+        err = new Error(e.message);
+        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+      } else if (e.name === 'CastError') {
+        err = new Error('Неверный идентификатор пользователя');
+        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+      } else {
+        err = new Error('Не удалось обновить аватар пользователя');
+        err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
       }
-
-      if (err.name === 'ValidationError') {
-        return res
-          .status(constants.HTTP_STATUS_BAD_REQUEST)
-          .send({ message: err.message });
-      }
-
-      if (err.name === 'CastError') {
-        return res
-          .status(constants.HTTP_STATUS_BAD_REQUEST)
-          .send({ message: 'Неверный идентификатор пользователя' });
-      }
-      res
-        .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Не удалось обновить аватар пользователя' });
-      return next(err);
+      return next(e);
     });
 };
 
