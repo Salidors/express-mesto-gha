@@ -22,14 +22,6 @@ const login = (req, res) => {
 
       res.send({ token });
     })
-    // .then((matched) => {
-    //   if (!matched) {
-    //     return Promise.reject(new Error('Неправильные почта или пароль'));
-    //   }
-    //   const token = jwt.sign({ _id: user._id }, 'some-secret-key');
-
-    //   res.send({ message: 'Пользователь авторизован!' });
-    // })
     .catch((err) => {
       res
         .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
