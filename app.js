@@ -26,10 +26,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   res
     .status(err.statusCode || 500)
     .send({ message: err.message || 'Что-то случилось...' });
+  next();
 });
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
