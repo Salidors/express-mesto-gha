@@ -13,6 +13,8 @@
     "operator-linebreak": "off",
     "comma-dangle": "off",
     "function-paren-newline": "off",
-    "object-curly-newline": "off"
+    "object-curly-newline": "off",
+    "consistent-return": "off",
+    "nonblock-statement-body-position": "off"
   }
 }
