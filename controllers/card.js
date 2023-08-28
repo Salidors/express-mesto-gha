@@ -21,7 +21,7 @@ const postCard = (req, res, next) => {
     });
 };
 
-const getCards = (req, res, next) => CardModel.find()
+const getCards = (req, res, next) => CardModel.find({ owner: req.user._id })
   .then((cards) => res.send({ data: cards }))
   .catch(() => {
     const err = new Error('Не удалось загрузить карточки');
@@ -49,9 +49,6 @@ const putLike = (req, res, next) => {
       if (e.name === 'DocumentNotFoundError') {
         err = new Error('Карточка не найдена');
         err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
-      } else if (e.name === 'CastError') {
-        err = new Error('Неверный формат данных');
-        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
       } else {
         err = new Error('Нет возможности поставить like');
         err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
