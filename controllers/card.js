@@ -94,8 +94,9 @@ const deleteCard = (req, res, next) => CardModel.findById(req.params.cardId)
       error.statusCode = constants.HTTP_STATUS_FORBIDDEN;
       return next(error);
     }
-    return res.status(constants.HTTP_STATUS_OK).send({ message: 'Карта удалена' });
+    return CardModel.findByIdAndRemove(req.params.cardId);
   })
+  .then(() => res.status(constants.HTTP_STATUS_OK).send({ message: 'Карта удалена' }))
   .catch((e) => {
     let err;
     if (e.name === 'DocumentNotFoundError') {
