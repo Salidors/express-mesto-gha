@@ -24,15 +24,15 @@ app.post(
       about: Joi.string().min(2).max(30).default('Исследователь'),
       avatar: Joi.string()
         .pattern(
-          /(https?:\/\/)(w{3}\.)?(((\d{1,3}\.){3}\d{1,3})|((\w-?)+\.(ru|com)))(:\d{2,5})?((\/.+)+)?\/?#?/
+          /(https?:\/\/)(w{3}\.)?(((\d{1,3}\.){3}\d{1,3})|((\w-?)+\.(ru|com)))(:\d{2,5})?((\/.+)+)?\/?#?/,
         )
         .default(
-          'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'
+          'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
         ),
       password: Joi.string().required(),
     }),
   }),
-  createUser
+  createUser,
 );
 
 app.use(auth);
