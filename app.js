@@ -1,7 +1,7 @@
 const { constants } = require('http2');
 const express = require('express');
 const mongoose = require('mongoose');
-const { celebrate, Segments, isCelebrateError } = require('celebrate');
+const { celebrate, Segments, errors } = require('celebrate');
 const Joi = require('joi');
 
 const app = express();
@@ -35,6 +35,7 @@ app.post(
   createUser,
 );
 
+app.use(errors());
 app.use(auth);
 
 app.use(usersRouter);
@@ -47,25 +48,9 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (isCelebrateError(err)) {
-    const error = err.details.get('body').details[0];
-    res.status(constants.HTTP_STATUS_BAD_REQUEST).send({
-      statusCode: constants.HTTP_STATUS_BAD_REQUEST,
-      error: 'Bad request',
-      message: err.message,
-      validation: {
-        body: {
-          source: 'body',
-          keys: error.path,
-          message: error.message,
-        },
-      },
-    });
-  } else {
-    res
-      .status(err.statusCode || 500)
-      .send({ message: err.message || 'Что-то случилось...' });
-  }
+  res
+    .status(err.statusCode || 500)
+    .send({ message: err.message || 'Что-то случилось...' });
   next();
 });
 
