@@ -8,7 +8,7 @@ const port = 3000;
 const Joi = require('joi');
 const { login, createUser } = require('./controllers/user');
 const auth = require('./middlewares/auth');
-const { celebrate, Segments } = require('celebrate');
+const { celebrate, Segments, isCelebrateError } = require('celebrate');
 const usersRouter = require('./routers/users');
 const cardsRouter = require('./routers/cards');
 
@@ -47,9 +47,15 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  res
-    .status(err.statusCode || 500)
-    .send({ message: err.message || 'Что-то случилось...' });
+  if (isCelebrateError(err)) {
+    res
+      .status(constants.HTTP_STATUS_BAD_REQUEST)
+      .send({ message: 'Ошибка валидации поймана при помощи Joi' });
+  } else {
+    res
+      .status(err.statusCode || 500)
+      .send({ message: err.message || 'Что-то случилось...' });
+  }
   next();
 });
 
