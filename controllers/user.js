@@ -10,12 +10,14 @@ const login = (req, res, next) => {
   UserModel.findOne({ email })
     .select('+password')
     .then(async (user) => {
+      const error = new Error('Неправильные почта или пароль');
+      error.statusCode = constants.HTTP_STATUS_UNAUTHORIZED;
       if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        return next(error);
       }
       const matched = await bcrypt.compare(password, user.password);
       if (!matched) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        return next(error);
       }
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
         expiresIn: '1w',
@@ -54,9 +56,6 @@ const getUserById = (req, res, next) => UserModel.findById(req.params.id)
     if (e.name === 'DocumentNotFoundError') {
       err = new Error('Пользователь не найден');
       err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
-    } else if (e.name === 'CastError') {
-      err = new Error('Неверный идентификатор пользователя');
-      err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
     } else {
       err = new Error('Не удалось загрузить пользователя');
       err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;

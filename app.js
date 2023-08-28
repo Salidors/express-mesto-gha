@@ -41,12 +41,14 @@ app.post(
   }),
   createUser,
 );
-app.use(errors());
 
 app.use(auth);
 
 app.use(usersRouter);
 app.use(cardsRouter);
+
+app.use(errors());
+
 app.use((req, res, next) => {
   res
     .status(constants.HTTP_STATUS_NOT_FOUND)
@@ -55,6 +57,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  console.log({err});
   res
     .status(err.statusCode || 500)
     .send({ message: err.message || 'Что-то случилось...' });
