@@ -68,17 +68,12 @@ const createUser = (req, res, next) => {
   const {
     email, name, about, avatar, password,
   } = req.body;
-  if (!password) {
-    const err = new Error('Ошибка валидации');
-    err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
-    return next(err);
-  }
   bcrypt
     .hash(password, 10)
     .then((hash) => UserModel.create({
       email, name, about, avatar, password: hash,
     }))
-    .then(({ _doc }) => res.status(constants.HTTP_STATUS_CREATED).send({
+    .then(({ _doc }) => res.send({
       name: _doc.name,
       email: _doc.email,
       about: _doc.about,
@@ -98,8 +93,6 @@ const createUser = (req, res, next) => {
       }
       return next(err);
     });
-
-  return next();
 };
 
 const patchUser = (req, res, next) => {

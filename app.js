@@ -1,7 +1,8 @@
 const { constants } = require('http2');
 const express = require('express');
-const mongoose = require('mongoose');
 const { celebrate, Segments, errors } = require('celebrate');
+
+const mongoose = require('mongoose');
 const Joi = require('joi');
 
 const app = express();
@@ -14,7 +15,13 @@ const cardsRouter = require('./routers/cards');
 
 app.use(express.json());
 
-app.post('/signin', login);
+app.post('/signin', celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+  }),
+}), login);
+
 app.post(
   '/signup',
   celebrate({
@@ -34,8 +41,8 @@ app.post(
   }),
   createUser,
 );
-
 app.use(errors());
+
 app.use(auth);
 
 app.use(usersRouter);
