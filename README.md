@@ -15,5 +15,5 @@
 `npm run start` — запускает сервер  
 `npm run dev` — запускает сервер с hot-reload
 
-**GH-pages**
-[ссылка на gh-pages](https://github.com/Salidors/express-mesto-gha)
+**GH-репозиторий**
+[ссылка на репозиторий](https://github.com/Salidors/express-mesto-gha)
