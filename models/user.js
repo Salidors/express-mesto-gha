@@ -39,8 +39,17 @@ const userSchema = new mongoose.Schema({
 
 const validateUser = (user) => {
   const schema = Joi.object({
-    email: Joi.string().email().min(5).max(500).required(),
-    password: Joi.string().min(8).max(1024).required(),
+    email: Joi.string().email().required(),
+    name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
+    about: Joi.string().min(2).max(30).default('Исследователь'),
+    avatar: Joi.string()
+      .pattern(
+        /(https?:\/\/)(w{3}\.)?(((\d{1,3}\.){3}\d{1,3})|((\w-?)+\.(ru|com)))(:\d{2,5})?((\/.+)+)?\/?#?/
+      )
+      .default(
+        'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'
+      ),
+    password: Joi.string().required(),
   });
   return schema.validate(user);
 };

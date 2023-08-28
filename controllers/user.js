@@ -2,7 +2,7 @@ const { constants } = require('http2');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { userModel: UserModel, validateUser } = require('../models/user');
+const { userModel: UserModel } = require('../models/user');
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -79,10 +79,14 @@ const createUser = (req, res, next) => {
     .then((hash) =>
       UserModel.create({ email, name, about, avatar, password: hash })
     )
-    .then(({ _doc }) => {
-      const { password: userPassword, ...user } = _doc;
-      res.status(constants.HTTP_STATUS_CREATED).send(user);
-    })
+    .then(({ _doc }) =>
+      res.status(constants.HTTP_STATUS_CREATED).send({
+        name: _doc.name,
+        email: _doc.email,
+        about: _doc.about,
+        avatar: _doc.avatar,
+      })
+    )
     .catch((e) => {
       let err;
       if (e.name === 'ValidationError') {
@@ -90,7 +94,7 @@ const createUser = (req, res, next) => {
         err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
       } else if (e.code === 11000) {
         err = new Error('Емейл уже занят');
-        err.statusCode = constants.HTTP_STATUS_UNAUTHORIZED;
+        err.statusCode = constants.HTTP_STATUS_CONFLICT;
       } else {
         err = new Error('Не удалось создать пользователя');
         err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
