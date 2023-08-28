@@ -48,9 +48,18 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (isCelebrateError(err)) {
-    res
-      .status(constants.HTTP_STATUS_BAD_REQUEST)
-      .send({ message: err.message });
+    const error = err.details.get('body').details[0];
+    console.log(error);
+    res.status(constants.HTTP_STATUS_BAD_REQUEST).send({
+      message: err.message,
+      validation: {
+        body: {
+          source: 'body',
+          keys: error.path,
+          message: error.message,
+        },
+      },
+    });
   } else {
     res
       .status(err.statusCode || 500)
