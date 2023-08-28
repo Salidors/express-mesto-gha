@@ -69,12 +69,20 @@ const getUserById = (req, res, next) =>
 
 const createUser = (req, res, next) => {
   const { email, name, about, avatar, password } = req.body;
+  if (!password) {
+    const err = new Error('Ошибка валидации');
+    err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+    return next(err);
+  }
   bcrypt
     .hash(password, 10)
     .then((hash) =>
       UserModel.create({ email, name, about, avatar, password: hash })
     )
-    .then((user) => res.status(constants.HTTP_STATUS_CREATED).send(user))
+    .then(({ _doc }) => {
+      const { password: userPassword, ...user } = _doc;
+      res.status(constants.HTTP_STATUS_CREATED).send(user);
+    })
     .catch((e) => {
       let err;
       if (e.name === 'ValidationError') {

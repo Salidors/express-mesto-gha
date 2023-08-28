@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Необходимо заполнить Email'],
+    required: [true, 'Необходимо заполнить Password'],
     select: false,
   },
 });
