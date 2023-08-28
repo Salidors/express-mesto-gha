@@ -1,14 +1,14 @@
 const { constants } = require('http2');
 const express = require('express');
 const mongoose = require('mongoose');
+const { celebrate, Segments, isCelebrateError } = require('celebrate');
+const Joi = require('joi');
 
 const app = express();
 const port = 3000;
 
-const Joi = require('joi');
 const { login, createUser } = require('./controllers/user');
 const auth = require('./middlewares/auth');
-const { celebrate, Segments, isCelebrateError } = require('celebrate');
 const usersRouter = require('./routers/users');
 const cardsRouter = require('./routers/cards');
 
@@ -50,7 +50,7 @@ app.use((err, req, res, next) => {
   if (isCelebrateError(err)) {
     res
       .status(constants.HTTP_STATUS_BAD_REQUEST)
-      .send({ message: 'Ошибка валидации поймана при помощи Joi' });
+      .send({ message: err.message });
   } else {
     res
       .status(err.statusCode || 500)
