@@ -5,17 +5,35 @@ const mongoose = require('mongoose');
 const app = express();
 const port = 3000;
 
-const usersRouter = require('./routers/users');
-const cardsRouter = require('./routers/cards');
+const Joi = require('joi');
 const { login, createUser } = require('./controllers/user');
 const auth = require('./middlewares/auth');
-const validate = require('./middlewares/validate');
-const { validateUser } = require('./models/user');
+const { celebrate, Segments } = require('celebrate');
+const usersRouter = require('./routers/users');
+const cardsRouter = require('./routers/cards');
 
 app.use(express.json());
 
 app.post('/signin', login);
-app.post('/signup', [validate(validateUser)], createUser);
+app.post(
+  '/signup',
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      email: Joi.string().email().required(),
+      name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
+      about: Joi.string().min(2).max(30).default('Исследователь'),
+      avatar: Joi.string()
+        .pattern(
+          /(https?:\/\/)(w{3}\.)?(((\d{1,3}\.){3}\d{1,3})|((\w-?)+\.(ru|com)))(:\d{2,5})?((\/.+)+)?\/?#?/
+        )
+        .default(
+          'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'
+        ),
+      password: Joi.string().required(),
+    }),
+  }),
+  createUser
+);
 
 app.use(auth);
 
