@@ -2,7 +2,7 @@ const { constants } = require('http2');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const UserModel = require('../models/user');
+const { userModel: UserModel, validateUser } = require('../models/user');
 
 const login = (req, res, next) => {
   const { email, password } = req.body;

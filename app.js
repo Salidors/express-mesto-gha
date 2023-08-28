@@ -9,11 +9,13 @@ const usersRouter = require('./routers/users');
 const cardsRouter = require('./routers/cards');
 const { login, createUser } = require('./controllers/user');
 const auth = require('./middlewares/auth');
+const validate = require('./middlewares/validate');
+const { validateUser } = require('./models/user');
 
 app.use(express.json());
 
 app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signup', [validate(validateUser)], createUser);
 
 app.use(auth);
 
