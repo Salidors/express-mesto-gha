@@ -33,6 +33,8 @@ router.post('/cards', celebrate({
         /(https?:\/\/)(w{3}\.)?(((\d{1,3}\.){3}\d{1,3})|((\w-?)+\.(ru|com)))(:\d{2,5})?((\/.+)+)?\/?#?/,
       )
       .required(),
+    owner: Joi.string().length(24).required(),
+    likes: Joi.array(),
   }),
 }), postCard);
 router.get('/cards', getCards);

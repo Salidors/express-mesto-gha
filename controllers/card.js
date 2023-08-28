@@ -89,17 +89,21 @@ const deleteLike = (req, res, next) => {
     });
 };
 
-const deleteCard = (req, res, next) => CardModel.findByIdAndRemove(req.params.cardId)
+const deleteCard = (req, res, next) => CardModel.findById(req.params.cardId)
   .orFail()
-  .then(() => res.status(constants.HTTP_STATUS_OK).send({ message: 'Карта удалена' }))
+  .then(({ _doc }) => {
+    if (_doc.owner.equals(req.user._id)) {
+      const error = new Error('Не ваша карта');
+      error.statusCode = constants.HTTP_STATUS_FORBIDDEN;
+      return next(error);
+    }
+    return res.status(constants.HTTP_STATUS_OK).send({ message: 'Карта удалена' });
+  })
   .catch((e) => {
     let err;
     if (e.name === 'DocumentNotFoundError') {
       err = new Error('Карточка не найдена');
       err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
-    } else if (e.name === 'CastError') {
-      err = new Error('Неверный идентификатора карточки');
-      err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
     } else {
       err = new Error('Вы не можете удалить эту карточку');
       err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
