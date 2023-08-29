@@ -2,7 +2,7 @@ const { constants } = require('http2');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const NotFoundError = require('../errors/not-found-err');
-const UnauthorizedError = require('../errors/not-unauthorized-err');
+const UnauthorizedError = require('../errors/unauthorized-err');
 
 const UserModel = require('../models/user');
 

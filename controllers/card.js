@@ -2,7 +2,7 @@ const { constants } = require('http2');
 
 const CardModel = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
-const ForbiddenError = require('../errors/not-forbidden-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
 const postCard = (req, res, next) => {
   const { name, link } = req.body;
