@@ -1,10 +1,10 @@
-const { constants } = require('http2');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const NotFoundError = require('../errors/not-found-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
 const BadRequestError = require('../errors/bad-request-err');
 const InternalServerError = require('../errors/internal-server-err');
+const ConflictError = require('../errors/conflict-err');
 
 const UserModel = require('../models/user');
 
@@ -81,8 +81,7 @@ const createUser = (req, res, next) => {
       if (e.name === 'ValidationError') {
         err = new BadRequestError('Ошибка валидации');
       } else if (e.code === 11000) {
-        err = new Error('Емейл уже занят');
-        err.statusCode = constants.HTTP_STATUS_CONFLICT;
+        err = new ConflictError('Емейл уже занят');
       } else {
         err = new InternalServerError('Не удалось создать пользователя');
       }
