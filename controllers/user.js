@@ -2,6 +2,7 @@ const { constants } = require('http2');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const NotFoundError = require('../errors/not-found-err');
+const UnauthorizedError = require('../errors/not-unauthorized-err');
 
 const UserModel = require('../models/user');
 
@@ -11,8 +12,7 @@ const login = (req, res, next) => {
   UserModel.findOne({ email })
     .select('+password')
     .then(async (user) => {
-      const error = new Error('Неправильные почта или пароль');
-      error.statusCode = constants.HTTP_STATUS_UNAUTHORIZED;
+      const error = new UnauthorizedError('Неправильные почта или пароль');
       if (!user) {
         return next(error);
       }

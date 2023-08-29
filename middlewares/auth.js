@@ -1,5 +1,5 @@
-const { constants } = require('http2');
 const jwt = require('jsonwebtoken');
+const UnauthorizedError = require('../errors/not-unauthorized-err');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
@@ -14,8 +14,7 @@ module.exports = (req, res, next) => {
     const payload = jwt.verify(token, 'some-secret-key');
     req.user = payload;
   } catch (e) {
-    const err = new Error('Необходима авторизация');
-    err.statusCode = constants.HTTP_STATUS_UNAUTHORIZED;
+    const err = new UnauthorizedError('Необходима авторизация');
     next(err);
   }
 
