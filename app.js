@@ -1,9 +1,8 @@
 const express = require('express');
 const { celebrate, Segments, errors } = require('celebrate');
-const NotFoundError = require('./errors/not-found-err');
-
-const mongoose = require('mongoose');
 const Joi = require('joi');
+const mongoose = require('mongoose');
+const NotFoundError = require('./errors/not-found-err');
 
 const app = express();
 const port = 3000;
