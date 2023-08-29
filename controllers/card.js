@@ -4,6 +4,7 @@ const CardModel = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const ForbiddenError = require('../errors/forbidden-err');
 const BadRequestError = require('../errors/bad-request-err');
+const InternalServerError = require('../errors/internal-server-err');
 
 const postCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -16,8 +17,7 @@ const postCard = (req, res, next) => {
       if (e.name === 'ValidationError') {
         err = new BadRequestError('Неверно заполнены поля');
       } else {
-        err = new Error('Не удалось создать карточку');
-        err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+        err = new InternalServerError('Не удалось создать карточку');
       }
       return next(err);
     });
@@ -26,8 +26,7 @@ const postCard = (req, res, next) => {
 const getCards = (req, res, next) => CardModel.find({ owner: req.user._id })
   .then((cards) => res.send({ data: cards }))
   .catch(() => {
-    const err = new Error('Не удалось загрузить карточки');
-    err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+    const err = new InternalServerError('Не удалось загрузить карточки');
     return next(err);
   });
 
@@ -51,8 +50,7 @@ const putLike = (req, res, next) => {
       if (e.name === 'DocumentNotFoundError') {
         err = new NotFoundError('Карточка не найдена');
       } else {
-        err = new Error('Нет возможности поставить like');
-        err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+        err = new InternalServerError('Нет возможности поставить like');
       }
       return next(err);
     });
@@ -78,8 +76,7 @@ const deleteLike = (req, res, next) => {
       } else if (e.name === 'CastError') {
         err = new BadRequestError('Неверный формат данных');
       } else {
-        err = new Error('Нет возможности поставить like');
-        err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+        err = new InternalServerError('Нет возможности поставить like');
       }
       return next(err);
     });
@@ -100,8 +97,7 @@ const deleteCard = (req, res, next) => CardModel.findById(req.params.cardId)
     if (e.name === 'DocumentNotFoundError') {
       err = new NotFoundError('Карточка не найдена');
     } else {
-      err = new Error('Вы не можете удалить эту карточку');
-      err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+      err = new InternalServerError('Вы не можете удалить эту карточку');
     }
     return next(err);
   });

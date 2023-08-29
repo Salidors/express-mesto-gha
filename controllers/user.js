@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const NotFoundError = require('../errors/not-found-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
 const BadRequestError = require('../errors/bad-request-err');
+const InternalServerError = require('../errors/internal-server-err');
 
 const UserModel = require('../models/user');
 
@@ -28,8 +29,7 @@ const login = (req, res, next) => {
       return res.send({ token });
     })
     .catch((e) => {
-      const err = new Error(e.message);
-      err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+      const err = new InternalServerError(e.message);
       return next(err);
     });
 };
@@ -37,16 +37,14 @@ const login = (req, res, next) => {
 const getUsers = (req, res, next) => UserModel.find()
   .then((users) => res.send(users))
   .catch(() => {
-    const err = new Error('Не удалось загрузить данные пользователя');
-    err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+    const err = new InternalServerError('Не удалось загрузить данные пользователя');
     return next(err);
   });
 
 const getUser = (req, res, next) => UserModel.findById(req.user._id)
   .then((user) => res.send(user))
   .catch(() => {
-    const err = new Error('Не удалось загрузить данные пользователя');
-    err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+    const err = new InternalServerError('Не удалось загрузить данные пользователя');
     return next(err);
   });
 
@@ -58,8 +56,7 @@ const getUserById = (req, res, next) => UserModel.findById(req.params.id)
     if (e.name === 'DocumentNotFoundError') {
       err = new NotFoundError('Пользователь не найден');
     } else {
-      err = new Error('Не удалось загрузить пользователя');
-      err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+      err = new InternalServerError('Не удалось загрузить пользователя');
     }
     return next(err);
   });
@@ -87,8 +84,7 @@ const createUser = (req, res, next) => {
         err = new Error('Емейл уже занят');
         err.statusCode = constants.HTTP_STATUS_CONFLICT;
       } else {
-        err = new Error('Не удалось создать пользователя');
-        err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+        err = new InternalServerError('Не удалось создать пользователя');
       }
       return next(err);
     });
@@ -113,10 +109,9 @@ const patchUser = (req, res, next) => {
       } else if (e.name === 'CastError') {
         err = new BadRequestError('Неверный идентификатор пользователя');
       } else {
-        err = new Error('Не удалось обновить информацию о пользователе');
-        err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+        err = new InternalServerError('Не удалось обновить информацию о пользователе');
       }
-      return next(e);
+      return next(err);
     });
 };
 
@@ -136,10 +131,9 @@ const patchUserAvatar = (req, res, next) => {
       } else if (e.name === 'CastError') {
         err = new BadRequestError('Неверный идентификатор пользователя');
       } else {
-        err = new Error('Не удалось обновить аватар пользователя');
-        err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
+        err = new InternalServerError('Не удалось обновить аватар пользователя');
       }
-      return next(e);
+      return next(err);
     });
 };
 
