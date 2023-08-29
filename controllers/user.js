@@ -55,6 +55,8 @@ const getUserById = (req, res, next) => UserModel.findById(req.params.id)
     let err;
     if (e.name === 'DocumentNotFoundError') {
       err = new NotFoundError('Пользователь не найден');
+    } else if (e.name === 'CastError') {
+      err = new BadRequestError('Неверный идентификатор пользователя');
     } else {
       err = new InternalServerError('Не удалось загрузить пользователя');
     }

@@ -13,13 +13,11 @@ const postCard = (req, res, next) => {
   CardModel.create({ name, link, owner })
     .then((card) => res.status(constants.HTTP_STATUS_CREATED).send({ data: card }))
     .catch((e) => {
-      let err;
       if (e.name === 'ValidationError') {
-        err = new BadRequestError('Неверно заполнены поля');
+        next(new BadRequestError('Неверно заполнены поля'));
       } else {
-        err = new InternalServerError('Не удалось создать карточку');
+        next(new InternalServerError('Не удалось создать карточку'));
       }
-      return next(err);
     });
 };
 
@@ -49,6 +47,8 @@ const putLike = (req, res, next) => {
       let err;
       if (e.name === 'DocumentNotFoundError') {
         err = new NotFoundError('Карточка не найдена');
+      } else if (e.name === 'CastError') {
+        err = new BadRequestError('Неверный формат данных');
       } else {
         err = new InternalServerError('Нет возможности поставить like');
       }
