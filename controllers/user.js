@@ -1,6 +1,7 @@
 const { constants } = require('http2');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const NotFoundError = require('../errors/not-found-err');
 
 const UserModel = require('../models/user');
 
@@ -54,8 +55,7 @@ const getUserById = (req, res, next) => UserModel.findById(req.params.id)
   .catch((e) => {
     let err;
     if (e.name === 'DocumentNotFoundError') {
-      err = new Error('Пользователь не найден');
-      err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
+      err = new NotFoundError('Пользователь не найден');
     } else {
       err = new Error('Не удалось загрузить пользователя');
       err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
@@ -107,8 +107,7 @@ const patchUser = (req, res, next) => {
     .catch((e) => {
       let err;
       if (e.name === 'DocumentNotFoundError') {
-        err = new Error('Пользователь не найден');
-        err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
+        err = new NotFoundError('Пользователь не найден');
       } else if (e.name === 'ValidationError') {
         err = new Error(e.message);
         err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
@@ -133,8 +132,7 @@ const patchUserAvatar = (req, res, next) => {
     .catch((e) => {
       let err;
       if (e.name === 'DocumentNotFoundError') {
-        err = new Error('Пользователь не найден');
-        err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
+        err = new NotFoundError('Пользователь не найден');
       } else if (e.name === 'ValidationError') {
         err = new Error(e.message);
         err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;

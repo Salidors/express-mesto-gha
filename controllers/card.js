@@ -1,6 +1,7 @@
 const { constants } = require('http2');
 
 const CardModel = require('../models/card');
+const NotFoundError = require('../errors/not-found-err');
 
 const postCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -47,8 +48,7 @@ const putLike = (req, res, next) => {
     .catch((e) => {
       let err;
       if (e.name === 'DocumentNotFoundError') {
-        err = new Error('Карточка не найдена');
-        err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
+        err = new NotFoundError('Карточка не найдена');
       } else {
         err = new Error('Нет возможности поставить like');
         err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
@@ -73,8 +73,7 @@ const deleteLike = (req, res, next) => {
     .catch((e) => {
       let err;
       if (e.name === 'DocumentNotFoundError') {
-        err = new Error('Карточка не найдена');
-        err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
+        err = new NotFoundError('Карточка не найдена');
       } else if (e.name === 'CastError') {
         err = new Error('Неверный формат данных');
         err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
@@ -100,8 +99,7 @@ const deleteCard = (req, res, next) => CardModel.findById(req.params.cardId)
   .catch((e) => {
     let err;
     if (e.name === 'DocumentNotFoundError') {
-      err = new Error('Карточка не найдена');
-      err.statusCode = constants.HTTP_STATUS_NOT_FOUND;
+      err = new NotFoundError('Карточка не найдена');
     } else {
       err = new Error('Вы не можете удалить эту карточку');
       err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;

@@ -1,6 +1,6 @@
-const { constants } = require('http2');
 const express = require('express');
 const { celebrate, Segments, errors } = require('celebrate');
+const NotFoundError = require('./errors/not-found-err');
 
 const mongoose = require('mongoose');
 const Joi = require('joi');
@@ -50,10 +50,7 @@ app.use(cardsRouter);
 app.use(errors());
 
 app.use((req, res, next) => {
-  res
-    .status(constants.HTTP_STATUS_NOT_FOUND)
-    .send({ message: 'Тут ничего нет' });
-  next();
+  next(new NotFoundError('Тут ничего нет'));
 });
 
 app.use((err, req, res, next) => {
