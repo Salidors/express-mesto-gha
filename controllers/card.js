@@ -2,6 +2,7 @@ const { constants } = require('http2');
 
 const CardModel = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/not-forbidden-err');
 
 const postCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -89,8 +90,7 @@ const deleteCard = (req, res, next) => CardModel.findById(req.params.cardId)
   .orFail()
   .then(({ _doc }) => {
     if (!_doc.owner.equals(req.user._id)) {
-      const error = new Error('Не ваша карта');
-      error.statusCode = constants.HTTP_STATUS_FORBIDDEN;
+      const error = new ForbiddenError('Не ваша карта');
       return next(error);
     }
     return CardModel.findByIdAndRemove(req.params.cardId);
