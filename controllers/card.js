@@ -3,6 +3,7 @@ const { constants } = require('http2');
 const CardModel = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const ForbiddenError = require('../errors/forbidden-err');
+const BadRequestError = require('../errors/bad-request-err');
 
 const postCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -13,8 +14,7 @@ const postCard = (req, res, next) => {
     .catch((e) => {
       let err;
       if (e.name === 'ValidationError') {
-        err = new Error('Неверно заполнены поля');
-        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+        err = new BadRequestError('Неверно заполнены поля');
       } else {
         err = new Error('Не удалось создать карточку');
         err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
@@ -76,8 +76,7 @@ const deleteLike = (req, res, next) => {
       if (e.name === 'DocumentNotFoundError') {
         err = new NotFoundError('Карточка не найдена');
       } else if (e.name === 'CastError') {
-        err = new Error('Неверный формат данных');
-        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+        err = new BadRequestError('Неверный формат данных');
       } else {
         err = new Error('Нет возможности поставить like');
         err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;

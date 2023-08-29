@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const NotFoundError = require('../errors/not-found-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
+const BadRequestError = require('../errors/bad-request-err');
 
 const UserModel = require('../models/user');
 
@@ -81,8 +82,7 @@ const createUser = (req, res, next) => {
     .catch((e) => {
       let err;
       if (e.name === 'ValidationError') {
-        err = new Error('Ошибка валидации');
-        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+        err = new BadRequestError('Ошибка валидации');
       } else if (e.code === 11000) {
         err = new Error('Емейл уже занят');
         err.statusCode = constants.HTTP_STATUS_CONFLICT;
@@ -109,11 +109,9 @@ const patchUser = (req, res, next) => {
       if (e.name === 'DocumentNotFoundError') {
         err = new NotFoundError('Пользователь не найден');
       } else if (e.name === 'ValidationError') {
-        err = new Error(e.message);
-        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+        err = new BadRequestError(e.message);
       } else if (e.name === 'CastError') {
-        err = new Error('Неверный идентификатор пользователя');
-        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+        err = new BadRequestError('Неверный идентификатор пользователя');
       } else {
         err = new Error('Не удалось обновить информацию о пользователе');
         err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
@@ -134,11 +132,9 @@ const patchUserAvatar = (req, res, next) => {
       if (e.name === 'DocumentNotFoundError') {
         err = new NotFoundError('Пользователь не найден');
       } else if (e.name === 'ValidationError') {
-        err = new Error(e.message);
-        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+        err = new BadRequestError(e.message);
       } else if (e.name === 'CastError') {
-        err = new Error('Неверный идентификатор пользователя');
-        err.statusCode = constants.HTTP_STATUS_BAD_REQUEST;
+        err = new BadRequestError('Неверный идентификатор пользователя');
       } else {
         err = new Error('Не удалось обновить аватар пользователя');
         err.statusCode = constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
