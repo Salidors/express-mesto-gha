@@ -35,7 +35,7 @@ router.get('/users/me', getUser);
 
 router.get('/users/:id', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().length(24).required(),
+    id: Joi.string().hex().length(24).required(),
   }),
 }), getUserById);
 
