@@ -23,7 +23,7 @@ router.patch('/users/me/avatar', celebrate({
   [Segments.BODY]: Joi.object().keys({
     avatar: Joi.string()
       .pattern(
-        /https?:\/\/.*\.(?:png|jpg)/,
+        /https?:\/\/.*\.?/,
       )
       .default(
         'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',

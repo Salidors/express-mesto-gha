@@ -30,7 +30,7 @@ app.post(
       about: Joi.string().min(2).max(30).default('Исследователь'),
       avatar: Joi.string()
         .pattern(
-          /https?:\/\/.*\.(?:png|jpg)/,
+          /https?:\/\/.*\.?/,
         )
         .default(
           'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',

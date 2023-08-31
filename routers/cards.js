@@ -30,7 +30,7 @@ router.post('/cards', celebrate({
     name: Joi.string().min(2).max(30).required(),
     link: Joi.string()
       .pattern(
-        /https?:\/\/.*\.(?:png|jpg)/,
+        /https?:\/\/.*\.?/,
       )
       .required(),
   }).unknown(true),
